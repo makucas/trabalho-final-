@@ -1,0 +1,12 @@
+# depslib dependency file v1.0
+1605201873 source:c:\users\acer\desktop\codeblocks\chess\funcoes.c
+	"funcoes.h"
+	<stdio.h>
+
+1605202104 c:\users\acer\desktop\codeblocks\chess\funcoes.h
+
+1605202104 source:c:\users\acer\desktop\codeblocks\chess\main.c
+	<stdio.h>
+	<stdlib.h>
+	"funcoes.h"
+

@@ -54,18 +54,38 @@ int opcoes() {
     return n;
 }
 
-int converte(int *pn, char *pl) {
+int converte(int *pn, char l) {
+    int i , j = 0;;
 
+    i = 8;
+    while(1) {
+        if(*pn-(i) == j) {
+            *pn = j;
+            break;
+        }
+        j++;
+        i=i-2;
+    }
+
+    j=0;
+    for(i = 97; i<105; i++) {
+        if(l == i) {
+            return j;
+        }
+        j++;
+    }
 }
 
 void move_peca(char m[8][8]) {
-    int num;
+    int num_i, ltr_i, num_f, ltr_f;
     char ltr;
     printf("Numero e Letra aonde a peca se encontra\n");
-    scanf("%d%c", &num, &ltr);
-    converte(&num, &ltr);
-
-
-
+    scanf("%d%c", &num_i, &ltr);
+    ltr_i = converte(&num_i, ltr);
+    printf("Numero e Letra do destino\n");
+    scanf("%d%c", &num_f, &ltr);
+    ltr_f = converte(&num_f, ltr);
+    m[num_f][ltr_f] = m[num_i][ltr_i];
+    m[num_i][ltr_i] = ' ';
 }
 

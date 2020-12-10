@@ -9,6 +9,8 @@ int main() {
     int vez=0;
     struct borda b;
     struct jogador j[2];
+    struct LISTA *li;
+    struct LISTA *li_b;
     char tab[8][8] = {
         { 'T', 'C', 'B', 'Q', 'K', 'B', 'C', 'T', },
         { 'P', 'P', 'P', 'P', 'P', 'P', 'P', 'P', },
@@ -20,12 +22,14 @@ int main() {
         { 't', 'c', 'b', 'q', 'k', 'b', 'c', 't', }
     };
 
-
     estrutura_borda(&b);
     j[0].movimentos = 0;
     j[0].capturas = 0;
     j[1].movimentos = 0;
     j[1].capturas = 0;
+
+    li = NULL;
+    inicia(&li, &li_b);
 
     printf("Nome do jogador que utilizara as pecas ");
     SetColor(12);
@@ -50,7 +54,8 @@ int main() {
             muda_vez(&vez, x);
             printf("\nO Rei foi capturado, temos um vencedor\nqualquer tecla para acessar os dados da partida...\n");
             getch();
-            dados_jogadores(vez, x, j);
+            li = li_b;
+            dados_jogadores(vez, x, j, &li);
             break;
         }
         printf("jogam as ");
@@ -65,7 +70,7 @@ int main() {
             SetColor(7);
         }
         printf("(%s)\n", j[vez].name);
-        x = move_peca(tab, j, vez);
+        x = move_peca(tab, j, vez, &li);
         if(x == 0) {
             printf("movimento invalido, pressione alguma tecla para continuar\n");
             getch();
@@ -76,4 +81,3 @@ int main() {
 
     return 0;
 }
-

@@ -21,6 +21,27 @@ void SetColor(int ForgC) {
      return;
 }
 
+
+void inicia(struct LISTA **l, struct LISTA **l_b) {
+    *l = (struct LISTA*) malloc(sizeof(struct LISTA));
+    if(*l == NULL) {
+        printf("erro de alocacao\n");
+        exit(1);
+    }
+    (*l)->next = NULL;
+    (*l_b) = (*l);
+}
+
+void add(struct LISTA **l) {
+    (*l)->next = (struct LISTA*) malloc(sizeof(struct LISTA));
+     if((*l)->next == NULL) {
+        printf("erro de alocacao\n");
+        exit(1);
+    }
+    *l = (*l)->next;
+    (*l)->next = NULL;
+}
+
 void estrutura_borda(struct borda *pb) {
     int i;
     char c=97;
@@ -42,9 +63,9 @@ void printa_tabuleiro(char m[8][8], struct borda *pb) {
         for(a=0; a<3; a++){
             for(c=0; c<9; c++) {
                 if(l<8 && c<8) {
-                     if((l+c) % 2 == 0) {
+                    if((l+c) % 2 == 0) {
                         SetColor(15);
-                        if( (a == 1 && m[l][c] != ' ') || (a == 1 && m[l][c] != ' ') ) {
+                        if( (a == 1 && m[l][c] != ' ') ) {
                             printf("\xB2\xB2");
                             if(m[l][c] > 64 && m[l][c] < 91) {
                                 SetColor(3);
@@ -57,11 +78,10 @@ void printa_tabuleiro(char m[8][8], struct borda *pb) {
                                 SetColor(15);
                             }
                             printf("\xB2\xB2");
-                        }
-                        else printf("\xB2\xB2\xB2\xB2\xB2");
+                        }else printf("\xB2\xB2\xB2\xB2\xB2");
                     }else {
                         SetColor(15);
-                        if( (a == 1 && m[l][c] != ' ') || (a == 1 && m[l][c] != ' ') ) {
+                        if( (a == 1 && m[l][c] != ' ') ) {
                             printf("  ");
                             if(m[l][c] > 64 && m[l][c] < 91) {
                                 SetColor(3); //azul
@@ -130,17 +150,6 @@ int checa_movimento(int l_i, int c_i, int l_f, int c_f, char m[8][8], int vez) {
     int dC = abs(c_f - c_i);
 
     if(l_i == l_f && c_i == c_f) ToF = 1;
-    /*if(vez == 0) {
-        if( (m[l_i][c_i] > 96 && m[l_i][c_i] < 123) && (m[l_f][c_f] > 96 && m[l_f][c_f] < 123) ) ToF = 1;
-        printf("matriz na I%c\nmatriz na F%c\n", m[l_i][c_i], m[l_f][c_f]);
-        printf("pego\n");
-        getch();
-    }
-    if(vez == 1) {
-        if( (m[l_i][c_i] > 64 && m[l_i][c_i] < 91) && (m[l_f][c_f] > 64 && m[l_f][c_f] < 91) ) ToF = 1;
-        printf("pego\n");
-        getch();
-    }*/
     aux = m[l_i][c_i];
     if( (aux > 64 && aux < 91 && vez == 1) || ( (aux > 96 && aux < 123 && vez == 0) && (ToF!= 1) ) ) {
 
@@ -164,23 +173,33 @@ int checa_movimento(int l_i, int c_i, int l_f, int c_f, char m[8][8], int vez) {
     return 0;
 }
 
-int move_peca(char m[8][8], struct jogador *pj, int vez) {
+int move_peca(char m[8][8], struct jogador *pj, int vez, struct LISTA **l) {
     int num_i, ltr_i, num_f, ltr_f, ToF;
+    int num_ia, num_fa;
+    char ltr_ia, ltr_fa;
     char ltr;
 
     printf("Letra e Numero de origen  ");
     scanf("%*c%c%d", &ltr, &num_i);
-    if(num_i == 0) return 2;
+    num_ia = num_i;
+    ltr_ia = ltr;
     if((num_i < 1 || num_i > 8) || (ltr < 97 || ltr > 105)) return 0;
     ltr_i = converte(&num_i, ltr);
     printf("Letra e Numero de destino  ");
     scanf("%*c%c%d", &ltr, &num_f);
+    num_fa = num_f;
+    ltr_fa = ltr;
     printf("\n");
     if((num_f < 1 || num_f > 8) || (ltr < 97 || ltr > 105)) return 0;
     ltr_f = converte(&num_f, ltr);
 
     ToF = checa_movimento(num_i, ltr_i, num_f, ltr_f, m, vez);
     if(ToF == 1) {
+        (*l)->reg.ni = num_ia;
+        (*l)->reg.nf = num_fa;
+        (*l)->reg.ci = ltr_ia;
+        (*l)->reg.cf = ltr_fa;
+        add(l);
         if( m[num_f][ltr_f] != ' ') pj[vez].capturas++;
         if(m[num_f][ltr_f] == 'k' || m[num_f][ltr_f] == 'K') {
             m[num_f][ltr_f] = m[num_i][ltr_i];
@@ -210,7 +229,8 @@ int muda_vez(int *vez, int x) {
     return 0;
 }
 
-void dados_jogadores(int vez, int x, struct jogador *pj) {
+void dados_jogadores(int vez, int x, struct jogador *pj, struct LISTA **l) {
+    int i=1;
     system("CLS");
     if(vez == 0) {
         printf("parabens ");
@@ -238,8 +258,21 @@ void dados_jogadores(int vez, int x, struct jogador *pj) {
     printf("%s:\n", pj[1].name);
     SetColor(7);
     printf("realizou %d movimentos.\n", pj[1].movimentos);
-    printf("capturou %d pecas.\n", pj[1].capturas);
+    printf("capturou %d pecas.\n\n", pj[1].capturas);
 
+    SetColor(7);
+    printf("--LANCES JOGADOS--\n\n");
+    while((*l)->next != NULL) {
+        SetColor(7);
+        printf("%d. ", i);
+        if(i%2 == 0) SetColor(3);
+        else if(i%2 != 0) SetColor(12);
+        printf("%c%d %c%d ", (*l)->reg.ci, (*l)->reg.ni, (*l)->reg.cf, (*l)->reg.nf);
+        *l = (*l)->next;
+        i++;
+    }
+    SetColor(7);
+    printf("\n\n");
 }
 
 
